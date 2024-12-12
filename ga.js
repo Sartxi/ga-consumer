@@ -2,18 +2,38 @@ import { LitElement, html } from 'lit';
 import { getSheet } from './util';
 
 const exampleBody = {
-  dateRanges: [
-      { startDate: "2020-03-31", endDate: "today" }
-  ],
   dimensions: [
-      { name: "country" }
+    { name: "sessionSource" },
   ],
   metrics: [
-      { name: "activeUsers" },
-      { name: "sessions" },
-      { name: "bounceRate" }
-  ]
-}
+    { name: "activeUsers" },
+    { name: "totalUsers" },
+  ],
+  dateRanges: [
+    { startDate: "2020-03-31", endDate: "today" },
+  ],
+  dimensionFilter: {
+    filter: {
+      fieldName: "sessionSource",
+      inListFilter: {
+        values: [
+          "facebook.com",
+          "x.com",
+          "twitter.com",
+          "linkedin.com",
+          "instagram.com",
+          "pinterest.com",
+          "youtube.com",
+          "github.com",
+          "reddit.com",
+          "tumblr.com",
+          "discord.com",
+          "strava.com",
+        ],
+      },
+    },
+  },
+};
 
 async function getAnalytics() {
   try {
@@ -26,13 +46,6 @@ async function getAnalytics() {
   }
 }
 
-/**
- * The Google Analytics Pod
- *
- * @fires count-changed - Indicates when the count changes
- * @slot - This element has a slot
- * @csspart button - The button
- */
 export class GaPod extends LitElement {
   static get properties() {
     return {
@@ -51,6 +64,8 @@ export class GaPod extends LitElement {
     const styleSheet = await getSheet('/styles/ga.css');
     this.renderRoot.adoptedStyleSheets = [styleSheet];
     const analytics = await getAnalytics();
+    console.log(analytics);
+    
     this.analytics = analytics.result;
   }
 
@@ -64,25 +79,29 @@ export class GaPod extends LitElement {
   }
 
   getPod(name) {
-    return `${name} Data`;
+    return `${name} - Sessions`;
+  }
+
+  getSocialIcon(name) {
+    return `https://s.magecdn.com/social/tc-${name.replace('.com', '')}.svg`;
   }
 
   getDataPod(key) {
-    const values = this.analytics[key][0][key];
+    const values = this.analytics[key];
     return html`
       <div class="sub-dimension">
-        <strong>${key}</strong>
-        <div class="values">
+        <div class="grid">
+          <div class="cell grow">
+            <img src="${this.getSocialIcon(key)}" alt="${key}" />${key}
+          </div>
           ${values.map((obj) => {
-            const [key, val] = Object.entries(obj)[0];
+            const val = Object.entries(obj)[0][1];
             const formatted = val % 1 !== 0 ? (Math.round(val * 100) / 100).toFixed(2) : val;
             return html`
-              <div class="value">
-                <span>${key}</span>
-                <strong>
-                  ${formatted.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                </strong>
-              </div>`;
+              <div class="cell">
+                ${formatted.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+              </div>
+            `;
           })}
         </div>
       </div>`;
@@ -90,7 +109,19 @@ export class GaPod extends LitElement {
 
   getAnalytics() {
     if (!this.analytics) return html`<div class="loader"></div>`;
-    return Object.keys(this.analytics).map((key) => (html`<div class="dimension">${this.getDataPod(key)}</div>`));
+    return (
+      html`
+        <div class="head grid">
+          <div class="cell grow">Referrer</div>
+          <div class="cell">Active</div>
+          <div class="cell">Total</div>
+        </div>
+        ${Object.keys(this.analytics).map((key) => (html`
+          <div class="dimension">
+              ${this.getDataPod(key)}
+            </div>
+          </div>`))}
+      `);
   }
 }
 
