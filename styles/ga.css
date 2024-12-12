@@ -1,0 +1,80 @@
+.ga-pod {
+  background-color: #eee;
+  padding: 20px;
+  border-radius: 10px;
+  width: 100%;
+}
+
+h2 {
+  margin: 0 0 15px;
+  padding-bottom: 10px;
+}
+
+.dimensions {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.dimension {
+  background-color: white;
+  padding: 10px;
+  width: 31%;
+  border-radius: 3px;
+}
+
+.sub-dimension strong {
+  font-size: 1.2em;
+  display: block;
+  padding: 5px;
+}
+
+.values {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  justify-content: space-between;
+}
+
+.value {
+  width: 32.6%;
+}
+
+.value strong {
+  font-size: 1.3em;
+  font-weight: 600;
+  padding: 10px;
+  display: block;
+}
+
+.value span {
+  display: block;
+  font-size: 0.9em;
+  background-color: #eee;
+  display: block;
+  padding-left: 5px;
+}
+
+.loader {
+  width: fit-content;
+  font-weight: bold;
+  font-family: monospace;
+  font-size: 18px;
+  color: #0000;
+  background: linear-gradient(90deg, #000 calc(50% - 0.5ch), #C02942 0 calc(50% + 0.5ch), #000 0) right/calc(200% + 1ch) 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: l8 2s infinite steps(11);
+}
+
+.loader:before {
+  content: "Loading..."
+}
+
+@keyframes l8 {
+  to {
+    background-position: left
+  }
+}
